@@ -8,6 +8,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,10 +18,12 @@ import java.util.List;
 
 import javax.xml.transform.OutputKeys;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int SPEAK_REQUEST = 10;
     TextView txtValue;
+
+    Button btnVoiceIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         txtValue = (TextView) findViewById(R.id.txtValue);
+        btnVoiceIntent = (Button) findViewById(R.id.btnVoiceIntent);
+        btnVoiceIntent.setOnClickListener(MainActivity.this);
 
         PackageManager packageManager = this.getPackageManager();
         List<ResolveInfo> listOfInformation = packageManager.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
@@ -62,5 +68,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        listenToTheUsersVoice();
     }
 }
