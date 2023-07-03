@@ -13,7 +13,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.akashsoam.tellmewhereapp.model.CountryDataSource;
+
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.xml.transform.OutputKeys;
@@ -24,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView txtValue;
 
     Button btnVoiceIntent;
+    public static CountryDataSource countryDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +36,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         txtValue = (TextView) findViewById(R.id.txtValue);
         btnVoiceIntent = (Button) findViewById(R.id.btnVoiceIntent);
+
         btnVoiceIntent.setOnClickListener(MainActivity.this);
+
+        Hashtable<String, String> countriesAndMessages = new Hashtable<>();
+        countriesAndMessages.put("America", "Welcome to America");
+        countriesAndMessages.put("France", "Welcome to France");
+        countriesAndMessages.put("Portugal", "Welcome to Portugal");
+        countriesAndMessages.put("Canada", "Welcome to Canada");
+        countriesAndMessages.put("Japan", "Welcome to Japan");
+        countryDataSource = new CountryDataSource(countriesAndMessages);
 
         PackageManager packageManager = this.getPackageManager();
         List<ResolveInfo> listOfInformation = packageManager.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
@@ -60,13 +73,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ArrayList<String> voiceWords = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
             float[] confidLevels = data.getFloatArrayExtra(RecognizerIntent.EXTRA_CONFIDENCE_SCORES);
 
-            int index = 0;
-            for (String userword :
-                    voiceWords) {
-                if (confidLevels != null && index < confidLevels.length) {
-                    txtValue.setText(userword + " - " + confidLevels[index]);
-                }
-            }
+//            int index = 0;
+//            for (String userword :
+//                    voiceWords) {
+//                if (confidLevels != null && index < confidLevels.length) {
+//                    txtValue.setText(userword + " - " + confidLevels[index]);
+//                }
+//            }
+
+            String countryMatchedWithUserWord = countryDataSource.matchWithMinimumConfidenceLevelOfUserWords(voiceWords, confidLevels);
+            Intent myMapActivity = new Intent(MainActivity.this, MapsActivity.class);
+            myMapActivity.putExtra(CountryDataSource.COUNTRY_KEY, countryMatchedWithUserWord);
+            startActivity(myMapActivity);
+
         }
     }
 
